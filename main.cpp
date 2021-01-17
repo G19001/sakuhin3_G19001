@@ -1,8 +1,8 @@
 #include"DxLib.h"
 #include"resource.h"
 
-#define GAME_WIDTH 800
-#define GAME_HEIGHT 600
+#define GAME_WIDTH 1000
+#define GAME_HEIGHT 700
 #define GAME_COLOR 32
 
 #define GAME_WINDOW_BAR 0
@@ -25,10 +25,10 @@
 
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
-#define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\space1.png")
+#define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\map1.png")
 #define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\kyaru.png")
 
-#define IMAGE_TITLE_BK_PATH TEXT(".\\IMAGE\\space1.png")
+#define IMAGE_TITLE_BK_PATH TEXT(".\\IMAGE\\title1.png")
 #define IMAGE_TITLE_ROGO_PATH TEXT(".\\IMAGE\\GameTitle.png")
 #define IMAGE_TITLE_ROGO_ROTA 0.005
 #define IMAGE_TITLE_ROGO_ROTA_MAX 1.0
@@ -45,7 +45,7 @@
 #define IMAGE_END_FAIL_CNT 1
 #define IMAGE_END_FAIL_CNT_MAX 30
 
-#define IMAGE_BACK_REV_PATH TEXT(".\\IMAGE\\space2.png")
+#define IMAGE_BACK_REV_PATH TEXT(".\\IMAGE\\map1.png")
 #define IMAGE_BACK_NUM 4
 
 #define MUSIC_LOAD_ERR_TITLE    TEXT("音楽読み込みエラー")
@@ -56,8 +56,8 @@
 #define MUSIC_BGM_COMP_PATH TEXT(".\\MUSIC\\星屑サラウンド-1chorus-.mp3")
 #define MUSIC_BGM_FAIL_PATH TEXT(".\\MUSIC\\「ぴえん」のうた.mp3")
 
-#define GAME_MAP_TATE_MAX 9
-#define GAME_MAP_YOKO_MAX 13
+#define GAME_MAP_TATE_MAX 11
+#define GAME_MAP_YOKO_MAX 16
 #define GAME_MAP_KIND_MAX 2
 
 #define GAME_MAP_PATH TEXT(".\\IMAGE\\MAP\\map.png")
@@ -90,6 +90,7 @@ enum GAME_MAP_KIND
 
 enum GAME_SCENE {
 	GAME_SCENE_START,
+	GAME_SCENE_MANI,
 	GAME_SCENE_PLAY,
 	GAME_SCENE_END
 };
@@ -178,12 +179,6 @@ typedef struct STRUCT_CHARA
 	int CenterX;
 	int CenterY;
 
-	//MUSIC musicShot;
-
-	/*BOOL CanShot;*/
-	/*int ShotReLoadCnt;
-	int ShotReLoadCntMAX;*/
-
 	RECT coll;
 	iPOINT collBeforePt;
 
@@ -268,15 +263,17 @@ MUSIC BGM_FAIL;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 
-		k,k,k,k,k,k,k,g,k,k,k,k,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,k,
-		i,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,k,k,k,k,k,s,k,k,k,k,k,k,
+		k,k,k,k,k,k,k,g,k,k,k,k,k,k,k,k,
+		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
+		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
+		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
+		i,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
+		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
+		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
+		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
+		k,k,k,k,k,k,t,k,k,k,k,k,k,k,k,k,
+		k,k,k,k,k,k,s,k,k,k,k,k,k,k,k,k,
+		
 };
 
 GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
@@ -311,6 +308,10 @@ VOID MY_FONT_DELETE(VOID);
 VOID MY_START(VOID);
 VOID MY_START_PROC(VOID);
 VOID MY_START_DRAW(VOID);
+
+//VOID MY_MANI(VOID);
+//VOID MY_MANI_PROC(VOID);
+//VOID MY_MANI_DRAW(VOID);
 
 VOID MY_PLAY(VOID);
 VOID MY_PLAY_PROC(VOID);
@@ -460,6 +461,9 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpCmdLine
 		case GAME_SCENE_START:
 			MY_START();
 			break;
+		/*case GAME_SCENE_MANI:
+			MY_MANI();
+			break;*/
 		case GAME_SCENE_PLAY:
 			MY_PLAY();
 			break;
@@ -713,11 +717,11 @@ VOID MY_START_PROC(VOID)
 		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
 	}
 
-	//エンターキーを押したら、プレイシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
+	//Sキーを押したら、プレイシーンへ移動する
+	if (MY_KEY_DOWN(KEY_INPUT_S) == TRUE)
 	{
 		if (CheckSoundMem(BGM_TITLE.handle) != 0)
-		{
+		{ 
 			StopSoundMem(BGM_TITLE.handle);
 		}
 
@@ -737,6 +741,20 @@ VOID MY_START_PROC(VOID)
 		GameEndKind = GAME_END_FAIL;
 
 		GameScene = GAME_SCENE_PLAY;
+	}
+
+	if (MY_KEY_DOWN(KEY_INPUT_M) == TRUE)
+	{
+		if (CheckSoundMem(BGM_TITLE.handle) != 0)
+		{
+			StopSoundMem(BGM_TITLE.handle);
+		}
+
+		SetMouseDispFlag(FALSE);
+
+		GameEndKind = GAME_END_FAIL;
+
+		GameScene = GAME_SCENE_MANI;
 	}
 
 	if (ImageTitleROGO.rate < ImageTitleROGO.rateMAX)
@@ -791,9 +809,53 @@ VOID MY_START_DRAW(VOID)
 		DrawGraph(ImageTitleSTART.image.x, ImageTitleSTART.image.y, ImageTitleSTART.image.handle, TRUE);
 	}
 
-	DrawString(0, 0, "スタート画面(エンターキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(1, 0, "Sキー⇒ゲームスタート", GetColor(0, 0, 0));
+	DrawString(1, 20, "Mキー⇒説明画面", GetColor(0, 0, 0));
 	return;
 }
+
+//VOID MY_MANI(VOID)
+//{
+//	MY_MANI_PROC();
+//	MY_MANI_DRAW();
+//
+//	return;
+//}
+
+//VOID MY_MANI_PROC(VOID)
+//{
+//	if (CheckSoundMem(BGM_TITLE.handle) == 0)
+//	{
+//		ChangeVolumeSoundMem(255 * 50 / 100, BGM_TITLE.handle);
+//		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
+//	}
+//
+//	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
+//	{
+//		if (CheckSoundMem(BGM_COMP.handle) != 0)
+//		{
+//			StopSoundMem(BGM_COMP.handle);
+//		}
+//
+//		if (CheckSoundMem(BGM_FAIL.handle) != 0)
+//		{
+//			StopSoundMem(BGM_FAIL.handle);
+//		}
+//
+//		SetMouseDispFlag(TRUE);
+//
+//		GameEndKind = GAME_END_FAIL;
+//
+//		GameScene = GAME_SCENE_START;
+//
+//		return;
+//	}
+//}
+//
+//VOID MY_MANI_DROW(VOID)
+//{
+//	DrawGraph(ImageTitleBK.x, ImageTitleBK.y, ImageTitleBK.handle, TRUE);
+//}
 
 //プレイ画面
 VOID MY_PLAY(VOID)
@@ -840,46 +902,24 @@ VOID MY_PLAY_PROC(VOID)
 		}
 	}
 
-	player.speed = 2;
-	if (MY_KEY_DOWN(KEY_INPUT_W) == TRUE)
+	player.speed = 3;
+	if (MY_KEY_DOWN(KEY_INPUT_UP) == TRUE)
 	{
 		player.CenterY -= player.speed;
 	}
-	if (MY_KEY_DOWN(KEY_INPUT_S) == TRUE)
+	if (MY_KEY_DOWN(KEY_INPUT_DOWN) == TRUE)
 	{
 		player.CenterY += player.speed;
 	}
-	if (MY_KEY_DOWN(KEY_INPUT_A) == TRUE)
+	if (MY_KEY_DOWN(KEY_INPUT_LEFT) == TRUE)
 	{
 		player.CenterX -= player.speed;
 	}
-	if (MY_KEY_DOWN(KEY_INPUT_D) == TRUE)
+	if (MY_KEY_DOWN(KEY_INPUT_RIGHT) == TRUE)
 	{
 		player.CenterX += player.speed;
 	}
 
-	//if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
-	//	&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
-	//{
-	//	/*player.CenterX = mouse.Point.x;
-	//	player.CenterY = mouse.Point.y;*/
-
-	//	int MoveValue = 100;
-
-	//	if (abs(player.collBeforePt.x - mouse.Point.x) < MoveValue
-	//		&& abs(player.collBeforePt.y - mouse.Point.y) < MoveValue)
-	//	{
-	//		player.CenterX = mouse.Point.x;
-	//		player.CenterY = mouse.Point.y;
-	//	}
-	//	else
-	//	{
-	//		player.CenterX = player.collBeforePt.x;
-	//		player.CenterY = player.collBeforePt.y;
-
-	//		SetMousePoint(player.collBeforePt.x, player.collBeforePt.y);
-	//	}
-	//}
 
 	player.coll.left = player.CenterX - mapChip.width / 2 + 10;
 	player.coll.top = player.CenterY - mapChip.height / 2 + 10;
@@ -967,32 +1007,6 @@ VOID MY_PLAY_PROC(VOID)
 		return;
 	}
 
-	/*player.CenterX = mouse.Point.x;
-	player.CenterY = mouse.Point.y;*/
-
-	//プレイヤーの位置に置き換える
-	/*player.image.x = player.CenterX - player.image.width / 2;
-	player.image.y = player.CenterY - player.image.height / 2;
-
-	if (player.image.x < 0) { player.image.x = 0; }
-	if (player.image.x + player.image.width > GAME_WIDTH) { player.image.x = GAME_WIDTH - player.image.width; }
-	if (player.image.y < 0) { player.image.y = 0; }
-	if (player.image.y + player.image.height > GAME_HEIGHT) { player.image.y = GAME_HEIGHT - player.image.height; }*/
-
-
-
-	//ショットが撃てないとき
-	//if (player.CanShot == FALSE)
-	//{
-	//	//リロード時間が終わったとき
-	//	if (player.ShotReLoadCnt == player.ShotReLoadCntMAX)
-	//	{
-	//		player.ShotReLoadCnt = 0;
-	//		player.CanShot = TRUE;		//再びショットできる
-	//	}
-
-	//	player.ShotReLoadCnt++;	
-	//}
 
 	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
@@ -1016,10 +1030,6 @@ VOID MY_PLAY_PROC(VOID)
 //プレイ画面の描画
 VOID MY_PLAY_DRAW(VOID)
 {
-	//緑の四角を描画
-	//DrawBox(10, 10, GAME_WIDTH - 10, GAME_HEIGHT - 10, GetColor(0, 255, 0), TRUE);
-
-	//DrawGraph(ImageBack.x, ImageBack.y, ImageBack.handle, TRUE);
 
 	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
@@ -1169,7 +1179,7 @@ VOID MY_END_DRAW(VOID)
 		break;
 	}
 
-	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(255, 255, 255));
+	DrawString(0, 0, "エンド画面(エスケープキーを押して下さい)", GetColor(0, 0, 0));
 	return;
 }
 
