@@ -45,6 +45,8 @@
 #define IMAGE_END_FAIL_CNT 1
 #define IMAGE_END_FAIL_CNT_MAX 30
 
+#define IMAGE_QUIZ_BK_PATH TEXT(".\\IMAGE\\seisaku.jpg")
+
 #define IMAGE_BACK_REV_PATH TEXT(".\\IMAGE\\map1.png")
 #define IMAGE_BACK_NUM 4
 
@@ -60,7 +62,7 @@
 #define GAME_MAP_YOKO_MAX 16
 #define GAME_MAP_KIND_MAX 2
 
-#define GAME_MAP_PATH TEXT(".\\IMAGE\\MAP\\map.png")
+#define GAME_MAP_PATH TEXT(".\\IMAGE\\MAP\\mapchi.png")
 
 #define MAP_DIV_WIDTH 64
 #define MAP_DIV_HEIGHT 64
@@ -82,16 +84,17 @@ enum GAME_MAP_KIND
 	n = -1,
 	k = 0,
 	t = 9,
-	s = 5,
-	g = 3,
+	s = 1,
+	g = 2,
 	a = 7,
-	i = 8
+	i = 2
 };
 
 enum GAME_SCENE {
 	GAME_SCENE_START,
 	GAME_SCENE_MANI,
 	GAME_SCENE_PLAY,
+	GAME_SCENE_QUIZ,
 	GAME_SCENE_END
 };
 
@@ -249,6 +252,7 @@ IMAGE_BACK ImageBack[IMAGE_BACK_NUM];
 IMAGE ImageTitleBK;
 IMAGE_ROTA ImageTitleROGO;
 IMAGE_BLINK ImageTitleSTART;
+IMAGE ImageQuizBK;
 
 IMAGE_BLINK ImageEndCOMP;
 IMAGE_BLINK ImageEndFAIL;
@@ -263,16 +267,17 @@ MUSIC BGM_FAIL;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 
-		k,k,k,k,k,k,k,g,k,k,k,k,k,k,k,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
-		i,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,
-		k,k,k,k,k,k,t,k,k,k,k,k,k,k,k,k,
-		k,k,k,k,k,k,s,k,k,k,k,k,k,k,k,k,
+		k,s,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
+		k,t,k,t,t,t,t,k,t,t,t,t,t,k,t,i,
+		k,t,k,t,k,k,t,k,t,k,k,k,k,k,t,k,
+		k,t,t,t,k,t,t,t,t,k,t,t,t,k,t,k,
+		k,t,k,k,k,t,k,t,k,k,t,k,k,k,t,k,
+		k,t,k,t,t,t,k,t,k,t,t,k,t,k,t,k,
+		k,k,k,k,k,k,k,t,t,t,k,k,t,k,t,k,
+		k,t,t,t,t,t,t,t,k,k,k,k,t,k,t,k,
+		k,t,k,k,k,k,k,t,k,t,t,t,t,k,t,k,
+		k,t,t,t,t,k,t,t,t,t,k,k,t,t,t,k,
+		k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
 		
 };
 
@@ -309,13 +314,17 @@ VOID MY_START(VOID);
 VOID MY_START_PROC(VOID);
 VOID MY_START_DRAW(VOID);
 
-//VOID MY_MANI(VOID);
-//VOID MY_MANI_PROC(VOID);
-//VOID MY_MANI_DRAW(VOID);
+VOID MY_MANI(VOID);
+VOID MY_MANI_PROC(VOID);
+VOID MY_MANI_DRAW(VOID);
 
 VOID MY_PLAY(VOID);
 VOID MY_PLAY_PROC(VOID);
 VOID MY_PLAY_DRAW(VOID);
+
+VOID MY_QUIZ(VOID);
+VOID MY_QUIZ_PROC(VOID);
+VOID MY_QUIZ_DRAW(VOID);
 
 VOID MY_END(VOID);
 VOID MY_END_PROC(VOID);
@@ -466,6 +475,9 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpCmdLine
 			break;*/
 		case GAME_SCENE_PLAY:
 			MY_PLAY();
+			break;
+		case GAME_SCENE_QUIZ:
+			MY_QUIZ();
 			break;
 		case GAME_SCENE_END:
 			MY_END();
@@ -717,8 +729,8 @@ VOID MY_START_PROC(VOID)
 		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
 	}
 
-	//Sキーを押したら、プレイシーンへ移動する
-	if (MY_KEY_DOWN(KEY_INPUT_S) == TRUE)
+	//ENTERキーを押したら、プレイシーンへ移動する
+	if (MY_KEY_DOWN(KEY_INPUT_RETURN) == TRUE)
 	{
 		if (CheckSoundMem(BGM_TITLE.handle) != 0)
 		{ 
@@ -741,20 +753,6 @@ VOID MY_START_PROC(VOID)
 		GameEndKind = GAME_END_FAIL;
 
 		GameScene = GAME_SCENE_PLAY;
-	}
-
-	if (MY_KEY_DOWN(KEY_INPUT_M) == TRUE)
-	{
-		if (CheckSoundMem(BGM_TITLE.handle) != 0)
-		{
-			StopSoundMem(BGM_TITLE.handle);
-		}
-
-		SetMouseDispFlag(FALSE);
-
-		GameEndKind = GAME_END_FAIL;
-
-		GameScene = GAME_SCENE_MANI;
 	}
 
 	if (ImageTitleROGO.rate < ImageTitleROGO.rateMAX)
@@ -809,8 +807,8 @@ VOID MY_START_DRAW(VOID)
 		DrawGraph(ImageTitleSTART.image.x, ImageTitleSTART.image.y, ImageTitleSTART.image.handle, TRUE);
 	}
 
-	DrawString(1, 0, "Sキー⇒ゲームスタート", GetColor(0, 0, 0));
-	DrawString(1, 20, "Mキー⇒説明画面", GetColor(0, 0, 0));
+	DrawString(1, 0, "ENTERキー⇒ゲームスタート", GetColor(0, 0, 0));
+	
 	return;
 }
 
@@ -824,13 +822,9 @@ VOID MY_START_DRAW(VOID)
 
 //VOID MY_MANI_PROC(VOID)
 //{
-//	if (CheckSoundMem(BGM_TITLE.handle) == 0)
-//	{
-//		ChangeVolumeSoundMem(255 * 50 / 100, BGM_TITLE.handle);
-//		PlaySoundMem(BGM_TITLE.handle, DX_PLAYTYPE_LOOP);
-//	}
+//	
 //
-//	if (MY_KEY_DOWN(KEY_INPUT_ESCAPE) == TRUE)
+//	if (MY_KEY_DOWN(KEY_INPUT_S) == TRUE)
 //	{
 //		if (CheckSoundMem(BGM_COMP.handle) != 0)
 //		{
@@ -842,19 +836,31 @@ VOID MY_START_DRAW(VOID)
 //			StopSoundMem(BGM_FAIL.handle);
 //		}
 //
+//
+//		player.CenterX = startPt.x;
+//		player.CenterY = startPt.y;
+//
+//		player.image.x = player.CenterX;
+//		player.image.y = player.CenterY;
+//
+//		player.collBeforePt.x = player.CenterX;
+//		player.collBeforePt.y = player.CenterY;
+//
 //		SetMouseDispFlag(TRUE);
 //
 //		GameEndKind = GAME_END_FAIL;
 //
-//		GameScene = GAME_SCENE_START;
+//		GameScene = GAME_SCENE_PLAY;
 //
 //		return;
 //	}
 //}
-//
+
 //VOID MY_MANI_DROW(VOID)
 //{
-//	DrawGraph(ImageTitleBK.x, ImageTitleBK.y, ImageTitleBK.handle, TRUE);
+//	DrawGraph(ImageQuizBK.x, ImageQuizBK.y, ImageQuizBK.handle, TRUE);
+//
+//	return;
 //}
 
 //プレイ画面
@@ -903,6 +909,9 @@ VOID MY_PLAY_PROC(VOID)
 	}
 
 	player.speed = 3;
+	
+	CHARA copi = player; //Playerのコピー
+
 	if (MY_KEY_DOWN(KEY_INPUT_UP) == TRUE)
 	{
 		player.CenterY -= player.speed;
@@ -920,7 +929,6 @@ VOID MY_PLAY_PROC(VOID)
 		player.CenterX += player.speed;
 	}
 
-
 	player.coll.left = player.CenterX - mapChip.width / 2 + 10;
 	player.coll.top = player.CenterY - mapChip.height / 2 + 10;
 	player.coll.right = player.CenterX + mapChip.width / 2 - 10;
@@ -930,14 +938,14 @@ VOID MY_PLAY_PROC(VOID)
 
 	if (MY_CHECK_MAP1_PLAYER_COLL(player.coll) == TRUE)
 	{
-		SetMousePoint(player.collBeforePt.x, player.collBeforePt.y);
 		IsMove = FALSE;
+		player = copi;
 	}
 
 	if (IsMove == TRUE)
 	{
-		if (mouse.Point.x >= 0 && mouse.Point.x <= GAME_WIDTH
-			&& mouse.Point.y >= 0 && mouse.Point.y <= GAME_HEIGHT)
+		if (player.image.x >= 0 && player.image.x <= GAME_WIDTH
+			&& player.image.y >= 0 && player.image.y <= GAME_HEIGHT)
 		{
 			player.image.x = player.CenterX - player.image.width;
 			player.image.y = player.CenterY - player.image.height;
@@ -947,14 +955,7 @@ VOID MY_PLAY_PROC(VOID)
 		}
 	}
 
-	RECT PlayerRect;
-	PlayerRect.left = player.image.x + 10;
-	PlayerRect.top = player.image.y + 10;
-	PlayerRect.right = player.image.x + player.image.width - 10;
-	PlayerRect.bottom = player.image.y + player.image.height - 10;
-
-
-	if (MY_CHECK_RECT_COLL(PlayerRect, GoalRect) == TRUE)
+	if (MY_CHECK_RECT_COLL(player.coll, GoalRect) == TRUE)
 	{
 
 		if (CheckSoundMem(BGM.handle) != 0)
@@ -966,47 +967,10 @@ VOID MY_PLAY_PROC(VOID)
 
 		GameEndKind = GAME_END_COMP;
 
-		GameScene = GAME_SCENE_END;
+		GameScene = GAME_SCENE_QUIZ;
 
 		return;
 	}
-
-	if (MY_CHECK_RECT_COLL(PlayerRect, NiseRect) == TRUE)
-	{
-
-		if (CheckSoundMem(BGM.handle) != 0)
-		{
-			StopSoundMem(BGM.handle);
-		}
-
-		SetMouseDispFlag(TRUE);
-
-		GameEndKind = GAME_END_FAIL;
-
-		GameScene = GAME_SCENE_END;
-
-		return;
-	}
-
-
-	if (player.image.x > GAME_WIDTH || player.image.y > GAME_HEIGHT
-		|| player.image.x + player.image.width < 0 || player.image.y + player.image.height < 0)
-	{
-
-		if (CheckSoundMem(BGM.handle) != 0)
-		{
-			StopSoundMem(BGM.handle);
-		}
-
-		SetMouseDispFlag(TRUE);
-
-		GameEndKind = GAME_END_FAIL;
-
-		GameScene = GAME_SCENE_END;
-
-		return;
-	}
-
 
 	for (int num = 0; num < IMAGE_BACK_NUM; num++)
 	{
@@ -1061,6 +1025,124 @@ VOID MY_PLAY_DRAW(VOID)
 		player.image.x, player.image.y,														//ココから
 		player.image.x + player.image.width * 2, player.image.y + player.image.height * 2,	//ココまで引き伸ばす
 		player.image.handle, TRUE);
+
+	return;
+}
+
+VOID MY_QUIZ(VOID)
+{
+	MY_QUIZ_PROC();
+	MY_QUIZ_DRAW();
+
+	return;
+}
+
+VOID MY_QUIZ_PROC(VOID)
+{
+	if (MY_KEY_DOWN(KEY_INPUT_1) == TRUE)
+	{
+		if (CheckSoundMem(BGM_TITLE.handle) != 0)
+		{
+			StopSoundMem(BGM_TITLE.handle);
+		}
+
+		SetMouseDispFlag(FALSE);
+
+		player.CenterX = startPt.x;
+		player.CenterY = startPt.y;
+
+		player.image.x = player.CenterX;
+		player.image.y = player.CenterY;
+
+		player.collBeforePt.x = player.CenterX;
+		player.collBeforePt.y = player.CenterY;
+
+		SetMousePoint(player.image.x, player.image.y);
+
+		GameEndKind = GAME_END_COMP;
+
+		GameScene = GAME_SCENE_END;
+	}
+
+	if (MY_KEY_DOWN(KEY_INPUT_2) == TRUE)
+	{
+		if (CheckSoundMem(BGM_TITLE.handle) != 0)
+		{
+			StopSoundMem(BGM_TITLE.handle);
+		}
+
+		SetMouseDispFlag(FALSE);
+
+		player.CenterX = startPt.x;
+		player.CenterY = startPt.y;
+
+		player.image.x = player.CenterX;
+		player.image.y = player.CenterY;
+
+		player.collBeforePt.x = player.CenterX;
+		player.collBeforePt.y = player.CenterY;
+
+		SetMousePoint(player.image.x, player.image.y);
+
+		GameEndKind = GAME_END_FAIL;
+
+		GameScene = GAME_SCENE_END;
+	}
+
+	if (MY_KEY_DOWN(KEY_INPUT_3) == TRUE)
+	{
+		if (CheckSoundMem(BGM_TITLE.handle) != 0)
+		{
+			StopSoundMem(BGM_TITLE.handle);
+		}
+
+		SetMouseDispFlag(FALSE);
+
+		player.CenterX = startPt.x;
+		player.CenterY = startPt.y;
+
+		player.image.x = player.CenterX;
+		player.image.y = player.CenterY;
+
+		player.collBeforePt.x = player.CenterX;
+		player.collBeforePt.y = player.CenterY;
+
+		SetMousePoint(player.image.x, player.image.y);
+
+		GameEndKind = GAME_END_FAIL;
+
+		GameScene = GAME_SCENE_END;
+	}
+
+	if (MY_KEY_DOWN(KEY_INPUT_4) == TRUE)
+	{
+		if (CheckSoundMem(BGM_TITLE.handle) != 0)
+		{
+			StopSoundMem(BGM_TITLE.handle);
+		}
+
+		SetMouseDispFlag(FALSE);
+
+		player.CenterX = startPt.x;
+		player.CenterY = startPt.y;
+
+		player.image.x = player.CenterX;
+		player.image.y = player.CenterY;
+
+		player.collBeforePt.x = player.CenterX;
+		player.collBeforePt.y = player.CenterY;
+
+		SetMousePoint(player.image.x, player.image.y);
+
+		GameEndKind = GAME_END_FAIL;
+
+		GameScene = GAME_SCENE_END;
+	}
+}
+
+VOID MY_QUIZ_DRAW(VOID)
+{
+	DrawGraph(ImageQuizBK.x, ImageQuizBK.y, ImageQuizBK.handle, TRUE);
 
 	return;
 }
@@ -1256,6 +1338,17 @@ BOOL MY_LOAD_IMAGE(VOID)
 	ImageEndFAIL.CntMAX = IMAGE_END_FAIL_CNT_MAX;
 	ImageEndFAIL.IsDraw = FALSE;
 
+	strcpy_s(ImageQuizBK.path, IMAGE_QUIZ_BK_PATH);
+	ImageQuizBK.handle = LoadGraph(ImageQuizBK.path);
+	if (ImageQuizBK.handle == -1)
+	{
+		MessageBox(GetMainWindowHandle(), IMAGE_QUIZ_BK_PATH, IMAGE_LOAD_ERR_TITLE, MB_OK);
+		return FALSE;
+	}
+	GetGraphSize(ImageQuizBK.handle, &ImageQuizBK.width, &ImageQuizBK.height);
+	ImageQuizBK.x = GAME_WIDTH / 2 - ImageQuizBK.width / 2;
+	ImageQuizBK.y = GAME_HEIGHT / 2 - ImageQuizBK.height / 2;
+
 	strcpy_s(ImageBack[0].image.path, IMAGE_BACK_PATH);
 	strcpy_s(ImageBack[1].image.path, IMAGE_BACK_REV_PATH);
 	strcpy_s(ImageBack[2].image.path, IMAGE_BACK_PATH);
@@ -1367,6 +1460,8 @@ VOID MY_DELETE_IMAGE(VOID)
 	DeleteGraph(ImageTitleBK.handle);
 	DeleteGraph(ImageTitleROGO.image.handle);
 	DeleteGraph(ImageTitleSTART.image.handle);
+
+	DeleteGraph(ImageQuizBK.handle);
 
 	DeleteGraph(ImageEndCOMP.image.handle);
 	DeleteGraph(ImageEndFAIL.image.handle);
