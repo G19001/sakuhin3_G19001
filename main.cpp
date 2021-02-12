@@ -26,7 +26,7 @@
 #define IMAGE_LOAD_ERR_TITLE	TEXT("画像読み込みエラー")
 
 #define IMAGE_BACK_PATH			TEXT(".\\IMAGE\\map1.png")
-#define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\kyaru.png")
+#define IMAGE_PLAYER_PATH		TEXT(".\\IMAGE\\kyaru1.png")
 
 #define IMAGE_TITLE_BK_PATH TEXT(".\\IMAGE\\title1.png")
 #define IMAGE_TITLE_ROGO_PATH TEXT(".\\IMAGE\\GameTitle.png")
@@ -58,14 +58,14 @@
 #define MUSIC_BGM_COMP_PATH TEXT(".\\MUSIC\\星屑サラウンド-1chorus-.mp3")
 #define MUSIC_BGM_FAIL_PATH TEXT(".\\MUSIC\\「ぴえん」のうた.mp3")
 
-#define GAME_MAP_TATE_MAX 11
-#define GAME_MAP_YOKO_MAX 16
+#define GAME_MAP_TATE_MAX 30
+#define GAME_MAP_YOKO_MAX 32
 #define GAME_MAP_KIND_MAX 2
 
 #define GAME_MAP_PATH TEXT(".\\IMAGE\\MAP\\mapchi.png")
 
-#define MAP_DIV_WIDTH 64
-#define MAP_DIV_HEIGHT 64
+#define MAP_DIV_WIDTH 32
+#define MAP_DIV_HEIGHT 32
 #define MAP_DIV_TATE 10
 #define MAP_DIV_YOKO 4
 #define MAP_DIV_NUM MAP_DIV_TATE*MAP_DIV_YOKO
@@ -92,7 +92,7 @@ enum GAME_MAP_KIND
 
 enum GAME_SCENE {
 	GAME_SCENE_START,
-	GAME_SCENE_MANI,
+	/*GAME_SCENE_MANI,*/
 	GAME_SCENE_PLAY,
 	GAME_SCENE_QUIZ,
 	GAME_SCENE_END
@@ -267,18 +267,32 @@ MUSIC BGM_FAIL;
 
 GAME_MAP_KIND mapData[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX]{
 
-		k,s,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
-		k,t,k,t,t,t,t,k,t,t,t,t,t,k,t,i,
-		k,t,k,t,k,k,t,k,t,k,k,k,k,k,t,k,
-		k,t,t,t,k,t,t,t,t,k,t,t,t,k,t,k,
-		k,t,k,k,k,t,k,t,k,k,t,k,k,k,t,k,
-		k,t,k,t,t,t,k,t,k,t,t,k,t,k,t,k,
-		k,k,k,k,k,k,k,t,t,t,k,k,t,k,t,k,
-		k,t,t,t,t,t,t,t,k,k,k,k,t,k,t,k,
-		k,t,k,k,k,k,k,t,k,t,t,t,t,k,t,k,
-		k,t,t,t,t,k,t,t,t,t,k,k,t,t,t,k,
-		k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
-		
+		k,s,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
+		k,t,k,t,t,t,t,k,t,t,t,t,t,k,t,t,t,t,t,t,t,t,t,t,t,t,t,t,t,k,t,i,
+		k,t,k,t,k,k,t,k,t,k,k,k,k,k,t,k,k,k,k,k,k,k,k,k,k,k,k,k,t,k,t,k,
+		k,t,t,t,k,t,t,t,t,k,t,t,t,k,t,k,t,t,t,t,t,t,t,t,t,t,t,t,t,k,t,k,
+		k,t,k,k,k,t,k,t,k,k,t,k,k,k,t,k,t,k,k,k,t,k,k,k,k,k,k,k,t,k,t,k,
+		k,t,k,t,t,t,k,t,k,t,t,k,t,k,t,k,k,k,t,k,t,k,t,t,t,t,t,k,t,k,t,k,
+		k,k,k,k,k,k,k,t,t,t,k,k,t,k,t,k,t,t,t,k,t,t,t,k,k,k,t,k,k,k,t,k,
+		k,t,t,t,t,t,t,t,k,k,k,k,t,k,t,k,t,k,k,k,k,k,k,k,t,k,t,t,t,k,t,k,
+		k,t,k,k,k,k,k,t,k,t,t,t,t,k,t,k,t,k,t,t,t,t,t,t,t,k,k,k,k,k,t,k,
+		k,t,t,t,t,k,t,t,t,t,k,k,t,t,t,t,t,t,t,k,t,k,k,k,k,k,t,t,t,k,t,k,
+		k,k,k,k,k,k,t,k,k,t,t,k,k,k,k,k,k,k,t,k,t,t,t,t,t,t,t,k,k,k,t,k,
+		k,t,t,k,k,k,t,k,k,k,k,k,t,k,t,k,t,t,t,k,t,k,k,k,k,k,k,k,t,k,t,k,
+		k,t,k,t,t,t,t,k,t,t,t,t,t,k,t,k,t,k,k,k,t,t,t,t,t,t,t,t,t,k,t,k,
+		k,t,k,t,k,k,t,k,t,k,k,k,k,k,t,k,t,t,t,k,k,k,k,t,k,k,k,k,k,k,t,k,
+		k,t,t,t,k,t,t,t,t,k,t,t,t,k,t,k,t,k,t,t,t,t,k,t,t,t,t,t,k,k,t,k,
+		k,t,k,k,k,t,k,t,k,k,t,k,k,k,t,k,k,k,k,t,k,k,k,k,t,k,k,k,t,t,t,k,
+		k,t,k,t,t,t,k,t,k,t,t,k,t,k,t,t,t,t,t,t,t,t,t,k,t,t,t,t,t,k,k,k,
+		k,k,k,k,k,k,k,t,t,t,k,k,t,k,t,k,k,k,k,k,k,k,t,k,k,k,k,k,k,k,t,k,
+		k,t,t,t,t,t,t,t,k,k,k,k,t,k,t,k,t,t,t,t,t,t,t,t,t,t,t,t,t,k,t,k,
+		k,t,k,k,k,k,k,t,k,t,t,t,t,k,t,k,t,k,k,k,k,k,k,t,k,k,k,k,t,k,t,k,
+		k,t,t,t,t,k,t,t,t,t,k,k,t,t,t,k,t,t,t,t,t,t,k,t,t,t,t,k,t,t,t,k,
+		k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
+		k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
+		k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
+		k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,k,
+			
 };
 
 GAME_MAP_KIND mapDataInit[GAME_MAP_TATE_MAX][GAME_MAP_YOKO_MAX];
@@ -361,10 +375,6 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpCmdLine
 	if (MY_LOAD_IMAGE() == FALSE) { return -1; }
 
 	if (MY_LOAD_MUSIC() == FALSE) { return -1; }
-
-	//player.CanShot = TRUE;
-	//player.ShotReLoadCnt = 0;
-	//player.ShotReLoadCntMAX = CHARA_RELOAD_HIGH;
 
 	if (MY_FONT_INSTALL_ONCE() == FALSE) { return -1; }
 
@@ -491,8 +501,6 @@ int WINAPI WinMain(HINSTANCE hinstance, HINSTANCE hPrevinstance, LPSTR lpCmdLine
 		MY_FPS_WAIT();
 
 	}
-
-	//SetClassLong(GetMainWindowHandle(), GCL_HCURSOR, OldWindowClass);
 
 	MY_FONT_DELETE();
 
@@ -1001,10 +1009,6 @@ VOID MY_PLAY_DRAW(VOID)
 		{
 			DrawGraph(ImageBack[num].image.x, ImageBack[num].image.y, ImageBack[num].image.handle, TRUE);
 
-			/*DrawFormatString(
-				ImageBack[num].image.x,
-				ImageBack[num].image.y,
-				GetColor(255, 255, 255), "背景画像：%d", num + 1);*/
 		}
 	}
 
